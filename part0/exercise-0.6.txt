@@ -1,0 +1,6 @@
+browser->server: HTTP POST https://studies.cs.helsinki.fi/exampleapp/new_note_spa
+
+note
+the browser simply sends the user input to 
+the server, and updates itself. 
+end note
