@@ -1,8 +1,6 @@
 import React from 'react'
 
-const Input = (props) => {
-    console.log(props)
-    
+const Input = (props) => {    
     return (
         <>
             <div>name: <input value={props.newName} onChange={props.handlePerson} /></div>

@@ -1,11 +1,11 @@
 import React from 'react'
 import Individual from './Individual'
-const People = ({list}) => {
-    console.log(list)
+
+const People = (props) => {
     return (
     <table>
         <tbody>
-            {list.map(people => <Individual key={people.name} name={people.name} number={people.number} />)}
+            {props.list.map(people => <Individual key={people.name} name={people.name} number={people.number} id={people.id} delPerson={props.delPerson(people.id, people.name)} />)}
         </tbody>
     </table>
     )

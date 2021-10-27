@@ -1,4 +1,4 @@
-import axios from 'axios';
+import axios from 'axios'
 import React, {useState, useEffect} from 'react'
 import Country from './components/Country'
 import Arr from './components/Arr'
@@ -29,3 +29,6 @@ function App() {
 }
 
 export default App;
+
+
+//REACT_APP_API_KEY='16b133d7f0f607f6f42861a5d867a3d8' npm start

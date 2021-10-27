@@ -2,18 +2,19 @@ import React, { useState, useEffect } from 'react'
 import Filter from './components/Filter'
 import People from './components/People'
 import Form from './components/Form'
-import axios from 'axios'
+import pplService from './services/peoples'
+import peoples from './services/peoples'
+
 const App = () => {
   const [persons, setPersons] = useState([])
   const [ newNumber, setNewNumber] = useState('010-357-3254')
   const [ newName, setNewName ] = useState('Agatha')
-  const [ newFilter, setNewFilter ] = useState(' ')
+  const [ filter, setFilter ] = useState('')
+  const [ message, setMessage ] = useState(null)
   const formSubmit = (event) => {
     event.preventDefault()
-
   }
 
-  let filter = []
   const handlePersonChange = (event) => {
     setNewName(event.target.value)
   }
@@ -21,44 +22,76 @@ const App = () => {
     setNewNumber(event.target.value)
   }
   const handleFilterChange = (event) => {
-    setNewFilter(event.target.value)
+    setFilter(event.target.value)
+  }
+  const updatePhonebook = () => {
+    pplService
+      .getAll()
+      .then(res => setPersons(res.data))
+  }
+  const deleteContact = (id, name) => {
+    if (window.confirm('Delete ' + name + '?')) {
+      pplService.del(id)
+      .then(res => console.log(res.data))
+      .then(updatePhonebook)
+      
+    } 
+
   }
   const add2Phonebook = () => {
-    if (persons.find(person => person.name === newName)) {
-      alert(`${newName} is already in phonebook`)
+    let foundPerson = persons.find(person => person.name === newName)
+    if (foundPerson !== undefined) {
+      if (window.confirm(`update ${newName}'s phone number?`)) {
+        let newEntry = {...foundPerson, number: newNumber}
+        updatePhonebook()
+        let answer = false;
+        for (const ppl in peoples) {
+          if (ppl == newName) return answer = true;
+        }
+        if (answer) {
+        pplService
+          .update(newEntry.id, newEntry)
+          .getAll()
+          .then(res => setPersons(res.data))
+        } else setMessage('Oops something went wrong')
+      }
+      
     } else {
       setPersons(persons.concat({name: newName, number: newNumber}))
+      let newPerson = {name: newName, number: newNumber}
+      console.log(pplService)
+      pplService
+        .create(newPerson)
+        .then(setMessage(`Added ${newName}`)
+        )
+
     }
   }
-
-  const filteredList = persons.filter(person => person.name.toLowerCase().includes(newFilter.toLowerCase()))
-
+  
   useEffect(() => {
-    axios
-      .get('http://localhost:3001/persons')
-      .then(response => {
-        console.log(response.data)
-        setPersons(response.data)
-      })
+    updatePhonebook()
   }, [])
+
+  const filteredList = persons.filter(person => person.name.toLowerCase().includes(filter.toLowerCase()))
 
   return (
     <div>
       <h2>Phonebook</h2>
       <form onSubmit={formSubmit}>
-        <Filter defaultValue={newFilter} handleChange={(e) => setNewFilter(e.target.value)} />
+        <Filter defaultValue={filter} handleChange={handleFilterChange} />
         <Form 
           handleClick={add2Phonebook} 
-          handlePerson={(e) => setNewName(e.target.value)} 
+          handlePerson={handlePersonChange} 
           handleNumber={(e) => setNewNumber(e.target.value)} 
           personValue={newName}
           numberValue={newNumber}  
+          
         />
        
       </form>
+      {message ? <p className='notice'>{message}</p> : <></> }
       <h2>Numbers</h2>
-      {console.log(persons, newFilter, filteredList)}
-      <People list={filteredList} />
+      <People list={filteredList} delPerson={() => deleteContact}/>
     </div>
   )
 }

@@ -1,7 +1,0 @@
-{countries.map(country => {
-                <div key={country.cca2}>
-                    <p key={country.cca2}>{country.name.common}</p>
-                    <button value='show-more'>Show</button>
-                </div>
-                }
-            )}
